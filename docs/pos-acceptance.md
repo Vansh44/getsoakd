@@ -3973,6 +3973,58 @@ delivery cost in ways one approval screen cannot show honestly.
 
 ---
 
+## 11m. Mink Phase 8A business brief inventory and order evidence
+
+**PS-MINK-8A.1 — Local shortages remain visible.** In Echos, set a tracked
+SKU to zero or negative at Shop and positive at Delhi, then ask for a business
+brief. Expect separate Shop/Delhi low/out counts matching each Inventory view;
+untracked SKUs do not become out-of-stock alerts. Counts are SKU-location
+counts, never claimed to be unique products.
+
+**PS-MINK-8A.2 — Scope and historical time stay explicit.** A daily brief uses
+yesterday in the store timezone, a weekly brief the last 7 completed local
+days. Both compare preceding calendar days. A Shop-only request/admin does
+not include Delhi or unassigned orders. Inventory is explicitly current when
+collected, not yesterday's inventory. Original order location scopes return
+records even when goods were received at another location (BORIS).
+
+**PS-MINK-8A.3 — Sparse data and failures are not healthy zeroes.** With fewer
+than 5 preceding recognized orders or return records, the respective trend is
+insufficient. Failed-payment counts refer to current order status among orders
+created in the window, not gateway attempts. An isolated test-source outage
+retries/fails the run; no completed all-clear is rendered. No stock, return,
+payment, refund or POS lifecycle state changes during the brief.
+
+**PS-MINK-8A.4 — Durable authority.** Remove Orders View or narrow a captured
+two-location scope between worker steps. Expect cancellation; a broader
+checkpoint must not be finalised. A user whose scope has narrowed also cannot
+reopen the old broad result. Completion is private to the requesting admin.
+Cancel, refresh, worker restart and retries do not create duplicate runs or
+notifications. Use ECH-P8A-01–24 in the living prompt suite for merchant checks.
+
+## 11n. Mink Phase 8B recurring watch acceptance
+
+Use Echos, with Shop and Delhi. No real customer or inventory writes are needed
+to test watch controls. Deliberately changing fixture stock is a separate
+tester-authorized operation, never an automatic watch action.
+
+| Story                                | Expected acceptance                                                                                                                    |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Ask “Keep an eye on stock at Delhi.” | Human setup link only; no watch until scope/schedule/quiet hours and consent are reviewed.                                             |
+| Enable all-location inventory watch  | Separate tracked-SKU low/out counts at Shop and Delhi. Cross-location stock cannot hide shortages.                                     |
+| Repeat same shortage                 | No repeated notification for unchanged per-location counts. Changes at one location can trigger one new alert.                         |
+| Unknown data                         | No healthy zeroes or invented recovery; source failure retries then pauses.                                                            |
+| Quiet hours                          | Collection continues; private alerts defer/coalesce, and detected recovery clears undelivered attention.                               |
+| Pause/delete during processing       | Cancels pending work and suppresses undelivered watch notifications; cannot retract an already delivered notice.                       |
+| Narrow admin to Shop                 | Old all-location evidence is unreadable; worker/alert delivery revalidates and pauses the old watch. No Delhi leakage.                 |
+| Revoke one required View permission  | Cannot create/resume or read broad results. Dashboard access still allows pause/delete.                                                |
+| Alert isolation                      | Only the creator receives a generic in-app notification; other admins and other tenants cannot read the watch.                         |
+| Check limits and duplicate clicks    | At most five per owner/twenty per store including paused, one check in flight, idempotent creation and no duplicate alert after retry. |
+
+Migration 0082 and the existing authenticated workflow heartbeat are required.
+These are deployment acceptance stories; unit tests do not establish live
+scheduler timing or model routing accuracy.
+
 ## 12. Known gaps
 
 Real and deliberate, so nobody files them as bugs:

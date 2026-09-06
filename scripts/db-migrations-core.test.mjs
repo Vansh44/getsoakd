@@ -22,10 +22,13 @@ describe("database migration controls", () => {
   it("loads the repository manifest and checksums the enrolled SQL", async () => {
     const loaded = await loadManifest();
     expect(loaded.baseline.id).toBe("baseline:cloudsql-2026-08-14");
-    expect(loaded.migrations).toHaveLength(80);
+    // 75 shared + five billing migrations + seven Mink migrations.
+    expect(loaded.migrations).toHaveLength(87);
+    // Keep the already-applied billing block before pending Mink migrations;
+    // otherwise the migration planner rejects the database as out_of_order.
     expect(loaded.migrations.at(-1)).toMatchObject({
-      id: "20260906_0080_plan_change_before_payment_help",
-      requires: ["20260906_0079_mandate_rail_choice_help"],
+      id: "20260905_0082_mink_phase_8b_watches",
+      requires: ["20260905_0081_mink_phase_8a_business_briefs"],
       transaction: true,
     });
     expect(loaded.migrations[0]).toMatchObject({
